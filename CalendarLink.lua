@@ -73,7 +73,11 @@ local ChatFrame_OnHyperlinkShow_O = ChatFrame_OnHyperlinkShow
 function ChatFrame_OnHyperlinkShow(frame, link, text, button)
     local type, value = link:match("(%a+):(.+)")
     if ( type == "gameevent" ) then
-        ShowCalendarEvent(value)
+        if ( value ~= "0" ) then
+            ShowCalendarEvent(value)
+        else
+            ShowCustomCalendarEvent(text)
+        end
     else
         ChatFrame_OnHyperlinkShow_O(self, link, text, button)
     end
@@ -90,6 +94,9 @@ function CalendarDayEventButton_OnClick(self, button)
         eventName = eventName:gsub("% Begins", "")
         eventName = eventName:gsub("% Ends", "")
         local eventId = CALENDAR_EVENT_IDS[eventName]
+        if ( eventId == nil ) then
+            eventId = 0
+        end
         if ( eventName ~= nil and eventId ~= nil ) then
             ChatEdit_InsertLink("|cffc6a04d|Hgameevent:"..eventId.."|h[Calendar: "..eventName.."]|h|r")
         end
@@ -114,6 +121,31 @@ function ShowCalendarEvent(eventId)
                 eventName = eventName:gsub("% Begins", "")
                 eventName = eventName:gsub("% Ends", "")
                 if ( eventName == CALENDAR_EVENT_NAMES[eventId] ) then
+                    CalendarDayEventButton_Click(_G["CalendarDayButton"..i.."EventButton"..j], true)
+                    return
+                end
+            end
+        end
+    end
+end
+
+-- open up the calendar and finds the next occurrence of given event name
+function ShowCustomCalendarEvent(name)
+    name = string.match(name, "%[Calendar: (.*)%]")
+    if ( CalendarFrame:IsShown() ) then
+        Calendar_Hide();
+        return
+    else
+        Calendar_Show();
+    end
+
+    for i = CalendarTodayFrame:GetParent():GetID(), CALENDAR_MAX_DAYS_PER_MONTH do
+        for j = 1, CALENDAR_DAYBUTTON_MAX_VISIBLE_EVENTS do
+            local eventName = _G["CalendarDayButton"..i.."EventButton"..j.."Text1"]:GetText()
+            if ( eventName ~= nil ) then
+                eventName = eventName:gsub("% Begins", "")
+                eventName = eventName:gsub("% Ends", "")
+                if ( eventName == name ) then
                     CalendarDayEventButton_Click(_G["CalendarDayButton"..i.."EventButton"..j], true)
                     return
                 end
