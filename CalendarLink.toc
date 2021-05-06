@@ -1,0 +1,9 @@
+## Interface: 30300
+## Title: CalendarLink
+## Notes: Allows to send and inspect calendar hyperlinks
+## Author: robinsch
+## Version: 0.0.001b
+## Dependencies:
+## OptionalDeps:
+
+CalendarLink.lua
